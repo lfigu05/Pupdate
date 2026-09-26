@@ -3,6 +3,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .models import Habit
+from django.shortcuts import get_object_or_404
+from datetime import date
+from .models import CheckIn
 
 # Create your views here.
 
@@ -28,4 +31,11 @@ def add_habit(request):
         name = request.POST.get('name')
         if name:
             Habit.objects.create(user=request.user, name=name)
+    return redirect('home')
+
+@login_required
+def check_in(request, habit_id):
+    if request.method == 'POST':
+        habit = get_object_or_404(Habit, id=habit_id, user=request.user)
+        CheckIn.objects.get_or_create(habit=habit, date=date.today())
     return redirect('home')

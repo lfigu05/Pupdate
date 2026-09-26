@@ -16,6 +16,12 @@ class CheckIn(models.Model): # naming my table
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE) # each check belongs to 1 habit, 1 habit can have many check-ins
     date = models.DateField() # stores the day it was done
 
+    def __str__(self):
+        return f"{self.habit.name} on {self.date}"
+
 class Pup(models.Model): # naming my table
     user = models.OneToOneField(User, on_delete=models.CASCADE) # each user has exactly 1 pup, and each pup has exactly one user
     name = models.CharField(max_length=100) # a name can have max 100 characters
+
+    def __str__(self):
+        return self.name

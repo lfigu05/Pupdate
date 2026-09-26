@@ -1,13 +1,19 @@
 <h1>Hi, {{ user.username }}!</h1>
 
 <h2>Your habits</h2>
-<u1>
+<ul>
     {% for habit in habits %}
-        <li>{{ habit.name }}</li>
+        <li>
+            {{ habit.name }}
+            <form method="post" action="{% url 'check_in' habit.id %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit">Done ✓</button>
+            </form>
+        </li>
     {% empty %}
         <li>No habits yet!</li>
     {% endfor %}
-</u1>
+</ul>
 
 <form method="post" action="{% url 'add_habit' %}">
     {% csrf_token %}
