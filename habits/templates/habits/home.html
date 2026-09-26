@@ -1,0 +1,21 @@
+<h1>Hi, {{ user.username }}!</h1>
+
+<h2>Your habits</h2>
+<u1>
+    {% for habit in habits %}
+        <li>{{ habit.name }}</li>
+    {% empty %}
+        <li>No habits yet!</li>
+    {% endfor %}
+</u1>
+
+<form method="post" action="{% url 'add_habit' %}">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="New habit" required>
+    <button type="submit">Add</button>
+</form>
+
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Log out</button>
+</form>
