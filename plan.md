@@ -6,6 +6,7 @@
 - see my list of habits ✓
 - mark a habit as done for today ✓
 - delete a habit ✓
+- set up AI study planner ✓
 - nice design
 
 ## STRETCH GOALS

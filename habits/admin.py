@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Habit, CheckIn, Pup
+from .models import Habit, CheckIn, Pup, StudyStep
 
 # Register your models here.
 admin.site.register(Habit)
 admin.site.register(CheckIn)
 admin.site.register(Pup)
+admin.site.register(StudyStep)

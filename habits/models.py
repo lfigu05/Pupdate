@@ -8,6 +8,7 @@ class Habit(models.Model): # naming my table
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100) # a name can have max 100 characters
     created_at = models.DateTimeField(auto_now_add=True) # saving date and time when the habit is made
+    due_date = models.DateField(null=True, blank=True)  # only for study goals like "OS quiz Friday". regular habits leave it empty
 
     def __str__(self):
         return self.name
@@ -25,3 +26,12 @@ class Pup(models.Model): # naming my table
 
     def __str__(self):
         return self.name
+
+class StudyStep(models.Model): # naming my table
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE) # the study goal it belongs to
+    task = models.CharField(max_length=200) # what to do
+    date = models.DateField() # when to do it
+    done = models.BooleanField(default=False) # automatically starts as not done
+
+    def __str__(self):
+        return f"{self.task} ({self.date})"

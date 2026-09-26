@@ -1,0 +1,52 @@
+<h1>Make a study plan</h1>
+
+<a href="{% url 'home' %}">← Back to home</a>
+
+{% if error %}
+    <p style="color:red">{{ error }}</p>
+{% endif %}
+
+<form method="post" onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').innerText = 'Making your plan...';">
+    {% csrf_token %}
+    <p>
+        <label>What's coming up?</label><br>
+        <input type="text" name="goal" placeholder="e.g. OS quiz" required>
+    </p>
+    <p>
+        <label>When is it due?</label><br>
+        <input type="date" name="due_date" required>
+    </p>
+    <p>
+        <label>What does it cover? (optional)</label><br>
+        <textarea name="topics" placeholder="e.g. threads, scheduling, deadlocks"></textarea>
+    </p>
+    <button type="submit">Make my plan</button>
+</form>
+
+{% for goal in goals %}
+    <h2>{{ goal.name }} (due {{ goal.due_date }})</h2>
+    <ul>
+        {% for step in goal.studystep_set.all|dictsort:"date" %}
+            <li>
+                {% if step.date == today %}
+                    <strong>
+                {% endif %}
+                {{ step.date }}: {{ step.task }}
+                {% if step.date == today %}    
+                    </strong>
+                {% endif %}
+
+                {% if step.done %}
+                    ✓
+                {% else %}
+                    <form method="post" action="{% url 'complete_step' step.id %}" style="display:inline">
+                        {% csrf_token %}
+                        <button type="submit">Done ✓</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% empty %}
+    <p>No study plans yet. Add one above!</p>
+{% endfor %}
