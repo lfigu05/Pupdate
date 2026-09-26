@@ -1,9 +1,20 @@
-<h1>Log in to Pupdate</h1>
+{% extends 'habits/base.html' %}
+{% block content %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Log in</button>
-</form>
+<div class="page-header">
+    <div class="header-pup">🐶</div>
+    <h1>Log in</h1>
+    <p>Your pup missed you.</p>
+</div>
 
-<p>New here? <a href="{% url 'signup' %}">Sign up</a></p>
+<div class="panel">
+    <form method="post" class="card auth">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="wide">Sign in</button>
+    </form>
+
+    <p class="switch">Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+</div>
+
+{% endblock %}

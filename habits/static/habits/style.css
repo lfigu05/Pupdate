@@ -1,0 +1,387 @@
+/* ======= COLOR PALETTE ======= */
+:root {
+    --sky: #BDE4F7;
+    --cloud: #FFFFFF;
+    --grass: #7BC96F;
+    --deep-grass: #3F7F3A;
+    --sun: #FFD86B;
+    --done: #9BBB8C;
+    --delete: #C75A5A;
+    --add: #7BA7C9;
+    --background: #8CC8EA;
+}
+
+/* ======= PAGE AND FONT ======= */
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--background);
+    font-family: 'Baloo 2', sans-serif;
+    color: var(--deep-grass);
+}
+
+h1, h2 { margin: 0 0 12px; font-weight: 800; }
+
+/* ======= SUN (page background) ======= */
+.sun {
+    position: fixed;
+    top: 40px;
+    right: 14%;
+    width: 90px;
+    height: 90px;
+    background: var(--sun);
+    border-radius: 50%;
+    box-shadow: 0 0 0 14px rgba(255, 216, 107, 0.35);
+}
+
+/* ======= CLOUDS (page background) ======= */
+.cloud {
+    position: fixed;
+    left: 0;
+    width: 120px;
+    height: 40px;
+    background: var(--cloud);
+    border-radius: 40px;
+    opacity: 0.9;
+    animation: drift 30s linear infinite; /* floats across the screen forever */
+}
+.cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: var(--cloud);
+    border-radius: 50%;
+}
+.cloud::before { width: 50px; height: 50px; top: -25px; left: 18px; }
+.cloud::after  { width: 64px; height: 64px; top: -34px; left: 48px; }
+
+/* spread from the top of the screen to the bottom, at different speeds */
+.cloud-1 { top: 5vh;  animation-duration: 25s; }
+.cloud-2 { top: 18vh; animation-duration: 35s; animation-delay: -10s; transform: scale(0.7); }
+.cloud-3 { top: 32vh; animation-duration: 30s; animation-delay: -20s; transform: scale(0.9); }
+.cloud-4 { top: 46vh; animation-duration: 40s; animation-delay: -5s;  transform: scale(0.6); }
+.cloud-5 { top: 60vh; animation-duration: 28s; animation-delay: -15s; transform: scale(0.8); }
+.cloud-6 { top: 74vh; animation-duration: 33s; animation-delay: -25s; transform: scale(0.75); }
+.cloud-7 { top: 88vh; animation-duration: 26s; animation-delay: -8s;  transform: scale(0.65); }
+
+@keyframes drift {
+    from { translate: -200px 0; }  /* starts just off the left edge */
+    to   { translate: 110vw 0; }   /* ends just past the right edge */
+}
+
+/* respect people who turn off animations on their device */
+@media (prefers-reduced-motion: reduce) {
+    .cloud { animation: none; }
+}
+
+/* ======= THE PHONE FRAME (one rectangle, like the sketch) ======= */
+.phone {
+    position: relative;
+    z-index: 1; /* sits in front of the sun and clouds */
+    max-width: 440px;
+    height: calc(100vh - 40px);
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column; /* content on top, nav at the bottom */
+    background: #EAF6FC; /* a lighter sky for the inside */
+    border: 3px solid var(--deep-grass);
+    border-radius: 32px;
+    overflow: hidden; /* keeps everything inside the rounded frame */
+}
+
+/* the middle area scrolls, so the nav always stays at the bottom of the frame */
+.app {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* on real phones, the frame IS the screen */
+@media (max-width: 480px) {
+    .phone {
+        height: 100vh;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+    }
+}
+
+/* ======= TOP SECTION: THE PUP'S SCENE ======= */
+.scene {
+    position: sticky; /* stays at the top while the habits scroll */
+    top: 0;
+    z-index: 2;
+    flex-shrink: 0;
+    height: 260px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--sky);
+    border-bottom: 3px solid var(--deep-grass);
+}
+
+.pup-name {
+    position: absolute;
+    top: 16px;
+    left: 0;
+    right: 0; /* stretches across so text-align works */
+    z-index: 2;
+    text-align: center;
+    font-size: 36px;
+}
+
+.pup {
+    position: relative;
+    z-index: 1; /* in front of the hills */
+    font-size: 80px;
+    margin-bottom: 50px; /* adjust so the pup stands on the middle hill */
+}
+
+/* layered wavy hills: light in back, dark in front */
+.hills {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 150px;
+}
+.hill-back  { fill: #BFE6B4; } /* lightest, far away */
+.hill-mid   { fill: #7BC96F; } /* grass green */
+.hill-front { fill: #55A149; } /* darkest, closest */
+
+/* small clouds inside the scene */
+.mini-cloud {
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    background: var(--cloud);
+    border-radius: 20px;
+}
+.mini-cloud::before {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    top: -14px;
+    left: 14px;
+    background: var(--cloud);
+    border-radius: 50%;
+}
+.mini-cloud-1 { top: 70px; left: 10%; }
+.mini-cloud-2 { top: 95px; right: 12%; transform: scale(0.8); }
+.mini-cloud-3 { top: 55px; right: 38%; transform: scale(0.6); opacity: 0.8; }
+
+/* ======= MIDDLE SECTION: HABITS ======= */
+.panel {
+    padding: 16px 20px;
+}
+
+.status { text-align: center; font-weight: 600; margin: 0 0 8px; }
+
+/* white card, used for forms */
+.card {
+    background: var(--cloud);
+    border-radius: 24px;
+    padding: 16px 20px;
+    margin: 20px;
+}
+.panel .card { margin: 0 0 16px; } /* cards inside the panel don't need extra outer spacing */
+
+/* habit pill cards */
+.habit-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* name left, buttons right */
+    background: var(--cloud);
+    border-radius: 999px; /* pill shape */
+    padding: 8px 8px 8px 24px;
+    margin-bottom: 12px;
+}
+.habit-name { font-size: 18px; font-weight: 600; }
+.habit-actions { display: flex; gap: 8px; }
+
+/* the "new habit" pill */
+.add-pill input {
+    border: none; /* the pill itself is the box */
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+.add-pill input:focus { outline: none; }
+
+/* ======= BUTTONS ======= */
+button {
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 16px;
+    background: var(--grass);
+    color: white;
+    cursor: pointer;
+}
+button:hover { background: var(--deep-grass); }
+button:focus-visible { outline: 3px solid var(--sun); }
+
+/* round icon buttons */
+.icon-btn {
+    width: 44px;
+    height: 44px; /* comfy tap size on phones */
+    padding: 0;
+    border-radius: 50%; /* perfect circle */
+    background: var(--cloud);
+    border: 2px solid var(--sky);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon-btn:hover { background: var(--sky); }
+
+/* solid colored done, delete, and add buttons */
+.done-btn   { background: var(--done);   border-color: var(--done); }
+.delete-btn { background: var(--delete); border-color: var(--delete); }
+.add-btn    { background: var(--add);    border-color: var(--add); }
+
+.done-btn:hover   { background: var(--done);   filter: brightness(0.9); }
+.delete-btn:hover { background: var(--delete); filter: brightness(0.9); }
+.add-btn:hover    { background: var(--add);    filter: brightness(0.9); }
+
+/* ======= TEXT BOXES ======= */
+input, textarea {
+    font-family: inherit;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border: 2px solid var(--sky);
+    border-radius: 16px;
+    margin-bottom: 10px;
+}
+
+/* ======= BOTTOM SECTION: NAV (inside the frame) ======= */
+.bottom-nav {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    padding: 10px 0 14px;
+    background: linear-gradient(to bottom, #55A149, #7BC96F);
+    border-top: 3px solid var(--deep-grass);
+}
+.bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+}
+.bottom-nav span {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+.bottom-nav form {
+    margin: 0;
+    display: flex;
+}
+
+/* logout button styled like the other nav links */
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+}
+.nav-btn:hover { background: none; opacity: 0.8; }
+
+/* ======= HAND-DRAWN ICONS ======= */
+.icon-btn img { width: 36px; height: 36px; }
+
+/* nav icons sit inside solid deep-green circles */
+.nav-btn img, .bottom-nav a img {
+    width: 48px;
+    height: 48px;
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--deep-grass);
+}
+
+/* ======= PAGE HEADER (plan, login, signup) ======= */
+.page-header {
+    text-align: center;
+    padding: 24px 20px 16px;
+    background: linear-gradient(to bottom, #7BC96F, #55A149);
+    border-bottom: 3px solid var(--deep-grass); /* same divider as the scene */
+}
+.page-header h1 { margin: 0; font-size: 32px; color: white; }
+.page-header p  { margin: 4px 0 0; font-weight: 600; color: white; }
+.header-pup { font-size: 56px; line-height: 1; }
+
+/* ======= SHARED FORM BITS ======= */
+label { display: block; font-weight: 600; margin-bottom: 4px; }
+button.wide { width: 100%; padding: 10px; margin-top: 4px; }
+.error-msg { color: var(--delete); font-weight: 600; text-align: center; }
+
+/* ======= PLAN PAGE: DROPDOWN GOALS ======= */
+.goal {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    margin-bottom: 14px;
+    padding: 4px 12px;
+}
+
+/* the clickable header */
+.goal summary {
+    cursor: pointer;
+    list-style: none; /* removes the default triangle */
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 4px;
+}
+.goal summary::-webkit-details-marker { display: none; } /* removes the triangle in Safari */
+
+/* our own arrow that rotates when open */
+.goal summary::before {
+    content: '▸';
+    font-size: 20px;
+    line-height: 1.4;
+    transition: transform 0.2s;
+}
+.goal[open] summary::before { transform: rotate(90deg); }
+
+/* name on top, details underneath */
+.goal-name { display: block; font-size: 20px; font-weight: 800; }
+.goal-meta { display: block; font-size: 14px; font-weight: 600; color: #6B8F66; }
+
+.goal-steps { padding-bottom: 8px; }
+
+/* ======= PLAN PAGE: STEPS ======= */
+.step-pill {
+    border-radius: 24px; /* less round than habits, since steps can be 2-3 lines */
+    gap: 12px;
+    padding: 12px 8px 12px 20px;
+}
+.step-date { display: block; font-size: 13px; font-weight: 600; color: #6B8F66; }
+.step-task { display: block; font-size: 15px; line-height: 1.4; }
+.step-pill .icon-btn { flex-shrink: 0; } /* keeps the button round even next to long text */
+
+.step-pill.today { outline: 3px solid var(--sun); } /* today's step stands out */
+.step-pill.done .step-task { text-decoration: line-through; opacity: 0.6; } /* finished steps fade */
+
+/* ======= LOGIN AND SIGNUP ======= */
+.auth ul, .helptext {
+    font-size: 13px;
+    color: #6B8F66;
+    padding-left: 18px;
+}
+.errorlist {
+    color: var(--delete);
+    list-style: none;
+    padding: 0;
+    font-weight: 600;
+}
+.switch   { text-align: center; font-weight: 600; }
+.switch a { color: var(--deep-grass); }

@@ -1,57 +1,90 @@
-<h1>Hi, {{ user.username }}!</h1>
+{% extends 'habits/base.html' %}
+{% load static %}
+{% block content %}
 
 {% if pup %}
-    {% if stage == 'grown' %}
-        <p style="font-size: 64px">🦮</p>
-    {% elif stage == 'young' %}
-        <p style="font-size: 64px">🐕</p>
-    {% else %}
-        <p style="font-size: 64px">🐶</p>
-    {% endif %}
 
-    <h2>{{ pup.name }}</h2>
+    <div class="scene">
+        <h1 class="pup-name">{{ pup.name }}</h1>
 
-    {% if sleepy %}
-        <p>{{ pup.name }} is napping. Check in to wake them up!</p>
-    {% endif %}
+        <div class="mini-cloud mini-cloud-1"></div>
+        <div class="mini-cloud mini-cloud-2"></div>
+        <div class="mini-cloud mini-cloud-3"></div>
 
-    <p>{{ days_completed }} days completed</p>
+        <svg class="hills" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true">
+            <path class="hill-back"  d="M0 60 Q 60 20 120 50 T 240 45 T 400 40 V140 H0 Z"/>
+            <path class="hill-mid"   d="M0 90 Q 80 55 160 85 T 320 80 T 400 75 V140 H0 Z"/>
+            <path class="hill-front" d="M0 118 Q 100 95 200 115 T 400 108 V140 H0 Z"/>
+        </svg>
+
+        <div class="pup">
+            {% if stage == 'grown' %}
+                🦮
+            {% elif stage == 'young' %}
+                🐕
+            {% else %}
+                🐶
+            {% endif %}
+        </div>
+    </div>
+
 {% else %}
-    <h2>Name your pup!</h2>
-    <form method="post" action="{% url 'name_pup' %}">
-        {% csrf_token %}
-        <input type="text" name="name" placeholder="Pup's name" required>
-        <button type="submit">Adopt</button>
-    </form>
+
+    <div class="card">
+        <h2>Name your pup!</h2>
+        <form method="post" action="{% url 'name_pup' %}">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Pup's name" required>
+            <button type="submit">Adopt 🐾</button>
+        </form>
+    </div>
+
+{% endif %}
+
+<div class="panel">
+
+    {% if pup %}
+    <p class="status">
+        {% if sleepy %}
+            💤 {{ pup.name }} is napping. Check in to wake them up!
+        {% else %}
+            {{ days_completed }} day{{ days_completed|pluralize }} completed
+        {% endif %}
+    </p>
     {% endif %}
 
-<h2>Your habits</h2>
-<ul>
+    <h2>Your habits</h2>
+
     {% for habit in habits %}
-        <li>
-            {{ habit.name }}
-            <form method="post" action="{% url 'check_in' habit.id %}" style="display:inline">
-                {% csrf_token %}
-                <button type="submit">Done ✓</button>
-            </form>
-
-            <form method="post" action="{% url 'delete_habit' habit.id %}" style="display:inline" onsubmit="return confirm('Delete this habit?')">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
-        </li>
+        <div class="habit-pill">
+            <span class="habit-name">{{ habit.name }}</span>
+            <div class="habit-actions">
+                <form method="post" action="{% url 'check_in' habit.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="icon-btn done-btn" aria-label="Mark {{ habit.name }} done">
+                        <img src="{% static 'habits/icons/done.png' %}" alt="">
+                    </button>
+                </form>
+                <form method="post" action="{% url 'delete_habit' habit.id %}" onsubmit="return confirm('Delete this habit?')">
+                    {% csrf_token %}
+                    <button type="submit" class="icon-btn delete-btn" aria-label="Delete {{ habit.name }}">
+                        <img src="{% static 'habits/icons/delete.png' %}" alt="">
+                    </button>
+                </form>
+            </div>
+        </div>
     {% empty %}
-        <li>No habits yet!</li>
+        <div class="habit-pill">No habits yet! Add one below.</div>
     {% endfor %}
-</ul>
 
-<form method="post" action="{% url 'add_habit' %}">
-    {% csrf_token %}
-    <input type="text" name="name" placeholder="New habit" required>
-    <button type="submit">Add</button>
-</form>
+    <form method="post" action="{% url 'add_habit' %}" class="habit-pill add-pill">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="New habit" required>
+        <button type="submit" class="icon-btn add-btn" aria-label="Add habit">
+            <img src="{% static 'habits/icons/add.png' %}" alt="">
+        </button>
+    </form>
 
-<form method="post" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button type="submit">Log out</button>
-</form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pupdate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'habits/style.css' %}">
+</head>
+<body>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+    <div class="cloud cloud-6"></div>
+    <div class="cloud cloud-7"></div>
+
+    <div class="phone">
+        <main class="app">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% if user.is_authenticated %}
+        <nav class="bottom-nav">
+            <a href="{% url 'home' %}"><img src="{% static 'habits/icons/home.png' %}" alt=""><span>Home</span></a>
+            <a href="{% url 'plan' %}"><img src="{% static 'habits/icons/plan.png' %}" alt=""><span>Plan</span></a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="nav-btn"><img src="{% static 'habits/icons/logout.png' %}" alt=""><span>Logout</span></button>
+            </form>
+        </nav>
+        {% endif %}
+    </div>
+</body>
+</html>

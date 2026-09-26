@@ -1,52 +1,71 @@
-<h1>Make a study plan</h1>
+{% extends 'habits/base.html' %}
+{% load static %}
+{% block content %}
 
-<a href="{% url 'home' %}">← Back to home</a>
+<div class="page-header">
+    <h1>Study Plans</h1>
+    <p>Turn a big deadline into small daily steps!</p>
+</div>
 
-{% if error %}
-    <p style="color:red">{{ error }}</p>
-{% endif %}
+<div class="panel">
 
-<form method="post" onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').innerText = 'Making your plan...';">
-    {% csrf_token %}
-    <p>
-        <label>What's coming up?</label><br>
-        <input type="text" name="goal" placeholder="e.g. OS quiz" value="{{ form_data.goal }}" required>
-    </p>
-    <p>
-        <label>When is it due?</label><br>
-        <input type="date" name="due_date" value="{{ form_data.due_date }}" required>
-    </p>
-    <p>
-        <label>What does it cover? (optional)</label><br>
-        <textarea name="topics" placeholder="e.g. threads, scheduling, deadlocks">{{ form_data.topics }}</textarea>
-    </p>
-    <button type="submit">Make my plan</button>
-</form>
+    {% if error %}
+        <p class="error-msg">{{ error }}</p>
+    {% endif %}
 
-{% for goal in goals %}
-    <h2>{{ goal.name }} (due {{ goal.due_date }})</h2>
-    <ul>
-        {% for step in goal.studystep_set.all|dictsort:"date" %}
-            <li>
-                {% if step.date == today %}
-                    <strong>
-                {% endif %}
-                {{ step.date }}: {{ step.task }}
-                {% if step.date == today %}    
-                    </strong>
-                {% endif %}
+    <form method="post" class="card plan-form" onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').innerText = 'Making your plan...';">
+        {% csrf_token %}
+        <label for="goal">What's coming up?</label>
+        <input type="text" id="goal" name="goal" placeholder="OS quiz" value="{{ form_data.goal }}" required>
 
-                {% if step.done %}
-                    ✓
-                {% else %}
-                    <form method="post" action="{% url 'complete_step' step.id %}" style="display:inline">
-                        {% csrf_token %}
-                        <button type="submit">Done ✓</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% empty %}
-    <p>No study plans yet. Add one above!</p>
-{% endfor %}
+        <label for="due_date">When is it due?</label>
+        <input type="date" id="due_date" name="due_date" value="{{ form_data.due_date }}" required>
+
+        <label for="topics">What does it cover? (optional)</label>
+        <textarea id="topics" name="topics" placeholder="Threads, scheduling, deadlocks">{{ form_data.topics }}</textarea>
+
+        <button type="submit" class="wide">Make my plan</button>
+    </form>
+
+    {% for goal in goals %}
+        <details class="goal" {% if forloop.first %}open{% endif %}>
+            <summary>
+                <div>
+                    <span class="goal-name">{{ goal.name }}</span>
+                    <span class="goal-meta">
+                        due {{ goal.due_date|date:"M j" }} · {{ goal.studystep_set.count }} step{{ goal.studystep_set.count|pluralize }}
+                    </span>
+                </div>
+            </summary>
+
+            <div class="goal-steps">
+                {% for step in goal.studystep_set.all|dictsort:"date" %}
+                    <div class="habit-pill step-pill {% if step.date == today %}today{% endif %} {% if step.done %}done{% endif %}">
+                        <div>
+                            <span class="step-date">{% if step.date == today %}Today{% else %}{{ step.date|date:"D, M j" }}{% endif %}</span>
+                            <span class="step-task">{{ step.task }}</span>
+                        </div>
+
+                        {% if step.done %}
+                            <span class="icon-btn done-btn" aria-label="Done">
+                                <img src="{% static 'habits/icons/done.png' %}" alt="">
+                            </span>
+                        {% else %}
+                            <form method="post" action="{% url 'complete_step' step.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="icon-btn add-btn" aria-label="Mark step done">
+                                    <img src="{% static 'habits/icons/done.png' %}" alt="">
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </details>
+    {% empty %}
+        <div class="habit-pill">No study plans yet. Add a deadline above!</div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
