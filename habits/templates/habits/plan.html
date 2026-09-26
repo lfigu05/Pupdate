@@ -10,15 +10,15 @@
     {% csrf_token %}
     <p>
         <label>What's coming up?</label><br>
-        <input type="text" name="goal" placeholder="e.g. OS quiz" required>
+        <input type="text" name="goal" placeholder="e.g. OS quiz" value="{{ form_data.goal }}" required>
     </p>
     <p>
         <label>When is it due?</label><br>
-        <input type="date" name="due_date" required>
+        <input type="date" name="due_date" value="{{ form_data.due_date }}" required>
     </p>
     <p>
         <label>What does it cover? (optional)</label><br>
-        <textarea name="topics" placeholder="e.g. threads, scheduling, deadlocks"></textarea>
+        <textarea name="topics" placeholder="e.g. threads, scheduling, deadlocks">{{ form_data.topics }}</textarea>
     </p>
     <button type="submit">Make my plan</button>
 </form>

@@ -92,8 +92,10 @@ def name_pup(request):
 @login_required
 def plan(request):
     error = None # message showing something went wrong
+    form_data = {} # remembers what the user typed so they dont have to retype it again after error
 
     if request.method == 'POST':
+        form_data = request.POST # keep what the user typed
         goal = request.POST.get('goal')
         due = request.POST.get('due_date')
         topics = request.POST.get('topics', '') # this is optional
@@ -115,7 +117,12 @@ def plan(request):
 
     # show all of the user's study steps, and group them by goal
     goals = Habit.objects.filter(user=request.user, due_date__isnull=False)
-    return render(request, 'habits/plan.html', {'goals': goals, 'error': error, 'today': date.today()})
+    return render(request, 'habits/plan.html', {
+        'goals': goals, 
+        'error': error, 
+        'today': date.today(),
+        'form_data': form_data,
+        })
 
 @login_required
 def complete_step(request, step_id):
