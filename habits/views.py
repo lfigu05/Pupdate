@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .models import Habit, CheckIn, Pup
 from django.shortcuts import get_object_or_404
-from datetime import date
+from datetime import date, timedelta
 
 # Create your views here.
 
@@ -25,7 +25,33 @@ def signup(request):
 def home(request):
     habits = Habit.objects.filter(user=request.user) # shows USER'S habits only
     pup = Pup.objects.filter(user=request.user).first() 
-    return render(request, 'habits/home.html', {'habits': habits, 'pup': pup})
+
+    #all checkins for this user's habits
+    user_checkins = CheckIn.objects.filter(habit__user=request.user) #habit__user tells it to follow the link from CheckIn to Habit then check its user
+    # count unique days with at least one check-in
+    # - multiple habits done on the same day will still count as only 1 day
+    days_completed = user_checkins.values('date').distinct().count()
+    # PUP NEVER SHRINKS
+    if days_completed >= 7:
+        stage = 'grown'
+    elif days_completed >= 3:
+        stage = 'young'
+    else:
+        stage = 'puppy'
+
+    # if its sleepy, there was no check-in today or yesterday
+    # date__gte means that the date is greater than or equal to
+    yesterday = date.today() - timedelta(days=1)
+    checked_in_recently = user_checkins.filter(date__gte=yesterday).exists()
+    sleepy = days_completed > 0 and not checked_in_recently # new users cant have a sleepy pup since they just adopted them
+
+    return render(request, 'habits/home.html', {
+        'habits': habits, 
+        'pup': pup,
+        'days_completed':  days_completed,
+        'stage': stage,
+        'sleepy': sleepy,
+    })
 
 # add a new habit for the user logged in
 @login_required

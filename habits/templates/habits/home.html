@@ -1,7 +1,21 @@
 <h1>Hi, {{ user.username }}!</h1>
 
 {% if pup %}
+    {% if stage == 'grown' %}
+        <p style="font-size: 64px">🦮</p>
+    {% elif stage == 'young' %}
+        <p style="font-size: 64px">🐕</p>
+    {% else %}
+        <p style="font-size: 64px">🐶</p>
+    {% endif %}
+
     <h2>{{ pup.name }}</h2>
+
+    {% if sleepy %}
+        <p>{{ pup.name }} is napping. Check in to wake them up!</p>
+    {% endif %}
+
+    <p>{{ days_completed }} days completed</p>
 {% else %}
     <h2>Name your pup!</h2>
     <form method="post" action="{% url 'name_pup' %}">
