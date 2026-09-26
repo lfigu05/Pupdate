@@ -9,6 +9,11 @@
                 {% csrf_token %}
                 <button type="submit">Done ✓</button>
             </form>
+
+            <form method="post" action="{% url 'delete_habit' habit.id %}" style="display:inline" onsubmit="return confirm('Delete this habit?')">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
         </li>
     {% empty %}
         <li>No habits yet!</li>

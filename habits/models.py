@@ -16,7 +16,7 @@ class CheckIn(models.Model): # naming my table
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE) # each check belongs to 1 habit, 1 habit can have many check-ins
     date = models.DateField() # stores the day it was done
 
-    def __str__(self):
+    def __str__(self): # added this because on the admin panel, the objects would return with (1), (2),...
         return f"{self.habit.name} on {self.date}"
 
 class Pup(models.Model): # naming my table

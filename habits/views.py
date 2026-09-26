@@ -39,3 +39,10 @@ def check_in(request, habit_id):
         habit = get_object_or_404(Habit, id=habit_id, user=request.user)
         CheckIn.objects.get_or_create(habit=habit, date=date.today())
     return redirect('home')
+
+@login_required
+def delete_habit(request, habit_id):
+    if request.method == 'POST':
+        habit = get_object_or_404(Habit, id=habit_id, user=request.user)
+        habit.delete()
+    return redirect('home')
