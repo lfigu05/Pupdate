@@ -1,5 +1,16 @@
 <h1>Hi, {{ user.username }}!</h1>
 
+{% if pup %}
+    <h2>{{ pup.name }}</h2>
+{% else %}
+    <h2>Name your pup!</h2>
+    <form method="post" action="{% url 'name_pup' %}">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Pup's name" required>
+        <button type="submit">Adopt</button>
+    </form>
+    {% endif %}
+
 <h2>Your habits</h2>
 <ul>
     {% for habit in habits %}
