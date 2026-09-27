@@ -113,6 +113,7 @@ def name_pup(request):
 @login_required
 def plan(request):
     error = None # message showing something went wrong
+    open_id = request.GET.get('open') # which dropdown stays open after clicking a check
     form_data = {} # remembers what the user typed so they dont have to retype it again after error
 
     if request.method == 'POST':
@@ -132,7 +133,7 @@ def plan(request):
                     habit = Habit.objects.create(user=request.user, name=goal, due_date=due_date)
                     for step_date, task in steps: # save each step
                         StudyStep.objects.create(habit=habit, task=task, date=step_date)
-                    return redirect('plan')
+                    return redirect(f"/plan/?open={habit.id}") # open the new plan right away
                 else:
                     error = "Couldn't make a plan right now. Try again in a moment!"
 
@@ -143,6 +144,7 @@ def plan(request):
         'error': error, 
         'today': date.today(),
         'form_data': form_data,
+        'open_id': open_id,
         })
 
 @login_required
@@ -154,4 +156,5 @@ def complete_step(request, step_id):
         step.save() # save changes to database
         # count it as a check-in for the day so finishing study steps grows the pup
         CheckIn.objects.get_or_create(habit=step.habit, date=date.today())
+        return redirect(f"/plan/?open={step.habit.id}") # keep the goal open
     return redirect('plan')

@@ -28,7 +28,7 @@
     </form>
 
     {% for goal in goals %}
-        <details class="goal" {% if forloop.first %}open{% endif %}>
+        <details class="goal" {% if open_id %}{% if goal.id|stringformat:"s" == open_id %}open{% endif %}{% elif forloop.first %}open{% endif %}>
             <summary>
                 <div>
                     <span class="goal-name">{{ goal.name }}</span>

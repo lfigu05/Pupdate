@@ -53,6 +53,17 @@
                 if (scrollBox) sessionStorage.setItem(scrollKey, scrollBox.scrollTop);
             });
         });
+
+        // keep animations continuous across page reloads by syncing them to the clock
+        document.querySelectorAll('.mini-cloud, .pup-img').forEach(el => {
+            const style = getComputedStyle(el);
+            const duration = parseFloat(style.animationDuration); // e.g. 40 (seconds)
+            if (!duration) return; // skip anything that isn't animated
+            const baseDelay = parseFloat(style.animationDelay) || 0; // keeps each cloud's own offset
+            const secondsNow = Date.now() / 1000; // time in seconds
+            // start the animation as if it had been running this whole time
+            el.style.animationDelay = `${baseDelay - (secondsNow % duration)}s`;
+        });
     </script>
 </body>
 </html>
