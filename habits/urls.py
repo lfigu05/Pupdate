@@ -10,4 +10,5 @@ urlpatterns = [
     path('habits/<int:habit_id>/delete/', views.delete_habit, name='delete_habit'),
     path('plan/', views.plan, name='plan'),
     path('steps/<int:step_id>/complete/', views.complete_step, name='complete_step'),
+    path('habits/<int:habit_id>/undo/', views.undo_check_in, name='undo_check_in'),
 ]

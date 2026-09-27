@@ -18,13 +18,7 @@
         </svg>
 
         <div class="pup">
-            {% if stage == 'grown' %}
-                🦮
-            {% elif stage == 'young' %}
-                🐕
-            {% else %}
-                🐶
-            {% endif %}
+            <img src="{% static 'habits/icons/pup-' %}{{ stage }}.png" alt="{{ pup.name }}" class="pup-img pup-{{ stage }}">
         </div>
     </div>
 
@@ -53,37 +47,66 @@
     </p>
     {% endif %}
 
-    <h2>Your habits</h2>
+    <div class="tabs">
+        <a href="?tab=todo" class="tab {% if tab == 'todo' %}active{% endif %}">To-do ({{ todo_habits|length }})</a>
+        <a href="?tab=done" class="tab {% if tab == 'done' %}active{% endif %}">Completed ({{ done_habits|length }})</a>
+    </div>
 
-    {% for habit in habits %}
-        <div class="habit-pill">
-            <span class="habit-name">{{ habit.name }}</span>
-            <div class="habit-actions">
-                <form method="post" action="{% url 'check_in' habit.id %}">
+    {% if tab == 'done' %}
+
+        {% for habit in done_habits %}
+            <div class="habit-pill done-pill">
+                <div>
+                    <span class="habit-name">{{ habit.name }}</span>
+                    {% if habit.due_date %}<span class="habit-due">due {{ habit.due_date|date:"M j" }}</span>{% endif %}
+                </div>
+                <form method="post" action="{% url 'undo_check_in' habit.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="icon-btn done-btn" aria-label="Mark {{ habit.name }} done">
-                        <img src="{% static 'habits/icons/done.png' %}" alt="">
-                    </button>
-                </form>
-                <form method="post" action="{% url 'delete_habit' habit.id %}" onsubmit="return confirm('Delete this habit?')">
-                    {% csrf_token %}
-                    <button type="submit" class="icon-btn delete-btn" aria-label="Delete {{ habit.name }}">
-                        <img src="{% static 'habits/icons/delete.png' %}" alt="">
+                    <button type="submit" class="icon-btn undo-btn" aria-label="Move {{ habit.name }} back to To-do">
+                        <img src="{% static 'habits/icons/undo.png' %}" alt="">
                     </button>
                 </form>
             </div>
-        </div>
-    {% empty %}
-        <div class="habit-pill">No habits yet! Add one below.</div>
-    {% endfor %}
+        {% empty %}
+            <div class="habit-pill">Nothing finished yet today. You've got this!</div>
+        {% endfor %}
 
-    <form method="post" action="{% url 'add_habit' %}" class="habit-pill add-pill">
-        {% csrf_token %}
-        <input type="text" name="name" placeholder="New habit" required>
-        <button type="submit" class="icon-btn add-btn" aria-label="Add habit">
-            <img src="{% static 'habits/icons/add.png' %}" alt="">
-        </button>
-    </form>
+    {% else %}
+
+        {% for habit in todo_habits %}
+            <div class="habit-pill">
+                <div>
+                    <span class="habit-name">{{ habit.name }}</span>
+                    {% if habit.due_date %}<span class="habit-due">due {{ habit.due_date|date:"M j" }}</span>{% endif %}
+                </div>
+                <div class="habit-actions">
+                    <form method="post" action="{% url 'check_in' habit.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="icon-btn done-btn" aria-label="Mark {{ habit.name }} done">
+                            <img src="{% static 'habits/icons/done.png' %}" alt="">
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'delete_habit' habit.id %}" onsubmit="return confirm('Delete this habit?')">
+                        {% csrf_token %}
+                        <button type="submit" class="icon-btn delete-btn" aria-label="Delete {{ habit.name }}">
+                            <img src="{% static 'habits/icons/delete.png' %}" alt="">
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div class="habit-pill">All done for today! 🎉</div>
+        {% endfor %}
+
+        <form method="post" action="{% url 'add_habit' %}" class="habit-pill add-pill">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="New habit" required>
+            <button type="submit" class="icon-btn add-btn" aria-label="Add habit">
+                <img src="{% static 'habits/icons/add.png' %}" alt="">
+            </button>
+        </form>
+
+    {% endif %}
 
 </div>
 

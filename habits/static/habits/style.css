@@ -9,6 +9,7 @@
     --delete: #C75A5A;
     --add: #7BA7C9;
     --background: #8CC8EA;
+    --undo: #E3B45E;
 }
 
 /* ======= PAGE AND FONT ======= */
@@ -37,13 +38,11 @@ h1, h2 { margin: 0 0 12px; font-weight: 800; }
 /* ======= CLOUDS (page background) ======= */
 .cloud {
     position: fixed;
-    left: 0;
     width: 120px;
     height: 40px;
     background: var(--cloud);
     border-radius: 40px;
     opacity: 0.9;
-    animation: drift 30s linear infinite; /* floats across the screen forever */
 }
 .cloud::before, .cloud::after {
     content: '';
@@ -54,19 +53,14 @@ h1, h2 { margin: 0 0 12px; font-weight: 800; }
 .cloud::before { width: 50px; height: 50px; top: -25px; left: 18px; }
 .cloud::after  { width: 64px; height: 64px; top: -34px; left: 48px; }
 
-/* spread from the top of the screen to the bottom, at different speeds */
-.cloud-1 { top: 5vh;  animation-duration: 25s; }
-.cloud-2 { top: 18vh; animation-duration: 35s; animation-delay: -10s; transform: scale(0.7); }
-.cloud-3 { top: 32vh; animation-duration: 30s; animation-delay: -20s; transform: scale(0.9); }
-.cloud-4 { top: 46vh; animation-duration: 40s; animation-delay: -5s;  transform: scale(0.6); }
-.cloud-5 { top: 60vh; animation-duration: 28s; animation-delay: -15s; transform: scale(0.8); }
-.cloud-6 { top: 74vh; animation-duration: 33s; animation-delay: -25s; transform: scale(0.75); }
-.cloud-7 { top: 88vh; animation-duration: 26s; animation-delay: -8s;  transform: scale(0.65); }
-
-@keyframes drift {
-    from { translate: -200px 0; }  /* starts just off the left edge */
-    to   { translate: 110vw 0; }   /* ends just past the right edge */
-}
+/* spread around the whole screen */
+.cloud-1 { top: 5vh;  left: 6%; }
+.cloud-2 { top: 18vh; left: 78%; transform: scale(0.7); }
+.cloud-3 { top: 32vh; left: 12%; transform: scale(0.9); }
+.cloud-4 { top: 46vh; left: 84%; transform: scale(0.6); }
+.cloud-5 { top: 60vh; left: 4%;  transform: scale(0.8); }
+.cloud-6 { top: 74vh; left: 80%; transform: scale(0.75); }
+.cloud-7 { top: 88vh; left: 15%; transform: scale(0.65); }
 
 /* respect people who turn off animations on their device */
 @media (prefers-reduced-motion: reduce) {
@@ -133,7 +127,7 @@ h1, h2 { margin: 0 0 12px; font-weight: 800; }
     position: relative;
     z-index: 1; /* in front of the hills */
     font-size: 80px;
-    margin-bottom: 50px; /* adjust so the pup stands on the middle hill */
+    margin-bottom: 10px; /* adjust so the pup stands on the middle hill */
 }
 
 /* layered wavy hills: light in back, dark in front */
@@ -166,9 +160,21 @@ h1, h2 { margin: 0 0 12px; font-weight: 800; }
     background: var(--cloud);
     border-radius: 50%;
 }
-.mini-cloud-1 { top: 70px; left: 10%; }
-.mini-cloud-2 { top: 95px; right: 12%; transform: scale(0.8); }
-.mini-cloud-3 { top: 55px; right: 38%; transform: scale(0.6); opacity: 0.8; }
+/* scene clouds drift slowly across the pup's sky */
+.mini-cloud { animation: scene-drift linear infinite; }
+.mini-cloud-1 { top: 70px;  animation-duration: 40s; }
+.mini-cloud-2 { top: 95px;  animation-duration: 55s; animation-delay: -20s; transform: scale(0.8); }
+.mini-cloud-3 { top: 115px; animation-duration: 48s; animation-delay: -35s; transform: scale(0.6); opacity: 0.8; }
+
+@keyframes scene-drift {
+    from { left: -80px; } /* starts just off the scene's left edge */
+    to   { left: 110%; }  /* ends just past the right edge */
+}
+
+/* respect people who turn off animations on their device */
+@media (prefers-reduced-motion: reduce) {
+    .mini-cloud { animation: none; }
+}
 
 /* ======= MIDDLE SECTION: HABITS ======= */
 .panel {
@@ -239,13 +245,27 @@ button:focus-visible { outline: 3px solid var(--sun); }
 .icon-btn:hover { background: var(--sky); }
 
 /* solid colored done, delete, and add buttons */
-.done-btn   { background: var(--done);   border-color: var(--done); }
-.delete-btn { background: var(--delete); border-color: var(--delete); }
-.add-btn    { background: var(--add);    border-color: var(--add); }
+.done-btn   { 
+    background: var(--done);   
+    border-color: var(--done); 
+}
+.delete-btn { 
+    background: var(--delete); 
+    border-color: var(--delete); 
+}
+.add-btn  { 
+    background: var(--add);    
+    border-color: var(--add); 
+}
+.undo-btn { 
+    background: var(--undo); 
+    border-color: var(--undo); 
+}
 
 .done-btn:hover   { background: var(--done);   filter: brightness(0.9); }
 .delete-btn:hover { background: var(--delete); filter: brightness(0.9); }
 .add-btn:hover    { background: var(--add);    filter: brightness(0.9); }
+.undo-btn:hover { background: var(--undo); filter: brightness(0.9); }
 
 /* ======= TEXT BOXES ======= */
 input, textarea {
@@ -385,3 +405,54 @@ button.wide { width: 100%; padding: 10px; margin-top: 4px; }
 }
 .switch   { text-align: center; font-weight: 600; }
 .switch a { color: var(--deep-grass); }
+
+/* ======= TO-DO / COMPLETED TABS ======= */
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.tab {
+    flex: 1; /* both tabs share the width equally */
+    text-align: center;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--deep-grass);
+    font-weight: 700;
+    text-decoration: none;
+}
+.tab.active {
+    background: var(--deep-grass); /* the open tab is solid green */
+    color: white;
+}
+
+/* due date under the habit name */
+.habit-due {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6B8F66;
+}
+
+/* finished habits look softer */
+.done-pill .habit-name {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* hand drawn pup */
+.pup-img { display: block; }
+.pup-puppy { width: 140px; }
+.pup-young { width: 180px; }
+.pup-grown { width: 220px; }
+.pup-img { animation: bounce 2s ease-in-out infinite; }
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pup-img { animation: none; }
+}

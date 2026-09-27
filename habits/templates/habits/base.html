@@ -33,5 +33,26 @@
         </nav>
         {% endif %}
     </div>
+    <script>
+        const scrollBox = document.querySelector('.app');
+        const scrollKey = 'scroll:' + location.pathname;
+        console.log('scroll script loaded, box found:', !!scrollBox);
+    
+        window.addEventListener('load', () => {
+            const saved = sessionStorage.getItem(scrollKey);
+            console.log('restoring to:', saved);
+            if (scrollBox && saved) {
+                scrollBox.scrollTop = Number(saved);
+                sessionStorage.removeItem(scrollKey);
+            }
+        });
+    
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', () => {
+                console.log('saving:', scrollBox.scrollTop, 'window:', window.scrollY);
+                if (scrollBox) sessionStorage.setItem(scrollKey, scrollBox.scrollTop);
+            });
+        });
+    </script>
 </body>
 </html>

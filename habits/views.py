@@ -24,7 +24,14 @@ def signup(request):
 # home page that shows the user's habits and pup (IF THEY ARE LOGGED IN)
 @login_required # if you are not logged in, you'll be sent to the login page
 def home(request):
-    habits = Habit.objects.filter(user=request.user) # shows USER'S habits only
+    habits = Habit.objects.filter(user=request.user, due_date__isnull=True) # everyday habits ONLY
+    # splitting habits into to-do and completed
+    tab = request.GET.get('tab', 'todo') # which tab is open?
+
+    done_ids = CheckIn.objects.filter(habit__user=request.user, date=date.today()).values_list('habit_id', flat=True)
+    todo_habits = habits.exclude(id__in=done_ids) # not done
+    done_habits = habits.filter(id__in=done_ids) # done
+
     pup = Pup.objects.filter(user=request.user).first() 
 
     #all checkins for this user's habits
@@ -47,11 +54,13 @@ def home(request):
     sleepy = days_completed > 0 and not checked_in_recently # new users cant have a sleepy pup since they just adopted them
 
     return render(request, 'habits/home.html', {
-        'habits': habits, 
         'pup': pup,
-        'days_completed':  days_completed,
+        'days_completed': days_completed,
         'stage': stage,
         'sleepy': sleepy,
+        'tab': tab,
+        'todo_habits': todo_habits,
+        'done_habits': done_habits,
     })
 
 # add a new habit for the user logged in
@@ -70,6 +79,8 @@ def check_in(request, habit_id):
         # finds the habit if it belongs to the user, that way nobody checks off anyone else's habit
         habit = get_object_or_404(Habit, id=habit_id, user=request.user)
         CheckIn.objects.get_or_create(habit=habit, date=date.today())
+        # syncing it with the plan page
+        StudyStep.objects.filter(habit=habit, date=date.today()).update(done=True)
     return redirect('home')
 
 # deleting a habit
@@ -79,6 +90,16 @@ def delete_habit(request, habit_id):
         habit = get_object_or_404(Habit, id=habit_id, user=request.user)
         habit.delete()
     return redirect('home')
+
+# undoing a habit from completed and back to to-do
+@login_required
+def undo_check_in(request, habit_id):
+    if request.method == 'POST':
+        habit = get_object_or_404(Habit, id=habit_id, user=request.user)
+        CheckIn.objects.filter(habit=habit, date=date.today()).delete()
+        # syncing it with the plan page
+        StudyStep.objects.filter(habit=habit, date=date.today()).update(done=False)
+    return redirect('/?tab=done') # do not leave the compeleted tab
 
 # name the user's pup (RENAMABLE)
 @login_required
@@ -116,7 +137,7 @@ def plan(request):
                     error = "Couldn't make a plan right now. Try again in a moment!"
 
     # show all of the user's study steps, and group them by goal
-    goals = Habit.objects.filter(user=request.user, due_date__isnull=False)
+    goals = Habit.objects.filter(user=request.user, due_date__isnull=False).order_by('due_date') # ordering by soonest deadline
     return render(request, 'habits/plan.html', {
         'goals': goals, 
         'error': error, 
